@@ -1,4 +1,4 @@
-# Time-stamp: "Sat Jul 14 00:27:20 2001 by Automatic Bizooty (__blocks2pm.plx)"
+# Time-stamp: "2014-05-12 01:35:49 MDT sburke@cpan.org"
 $Text::Unidecode::Char[0x02] = [
 'A', 'a', 'A', 'a', 'E', 'e', 'E', 'e', 'I', 'i', 'I', 'i', 'O', 'o', 'O', 'o',
 'R', 'r', 'R', 'r', 'U', 'u', 'U', 'u', 'S', 's', 'T', 't', 'Y', 'y', 'H', 'h',
@@ -11,7 +11,7 @@ $Text::Unidecode::Char[0x02] = [
 'R', 'R', 's', 'S', 'j', 'S', 'S', 't', 't', 'U', 'U', 'v', qq{^}, 'W', 'Y', 'Y',
 'z', 'z', 'Z', 'Z', qq{?}, qq{?}, qq{?}, 'C', qq{\@}, 'B', 'E', 'G', 'H', 'j', 'k', 'L',
 'q', qq{?}, qq{?}, 'dz', 'dZ', 'dz', 'ts', 'tS', 'tC', 'fN', 'ls', 'lz', 'WW', qq{]]}, '[?]', '[?]',
-'k', 'h', 'j', 'r', 'r', 'r', 'r', 'w', 'y', qq{'}, qq{"}, qq{`}, qq{'}, qq{`}, qq{`}, qq{'},
+'h', 'h', 'j', 'r', 'r', 'r', 'r', 'w', 'y', qq{'}, qq{"}, qq{`}, qq{'}, qq{`}, qq{`}, qq{'},
 qq{?}, qq{?}, qq{<}, qq{>}, qq{^}, 'V', qq{^}, 'V', qq{'}, qq{-}, qq{/}, qq{\\}, qq{,}, qq{_}, qq{\\}, qq{/},
 qq{:}, qq{.}, qq{`}, qq{'}, qq{^}, 'V', qq{+}, qq{-}, 'V', qq{.}, qq{\@}, qq{,}, qq{~}, qq{"}, 'R', 'X',
 'G', 'l', 's', 'x', qq{?}, "", "", "", "", "", "", "", 'V', qq{=}, qq{"}, '[?]',

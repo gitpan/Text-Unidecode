@@ -1,9 +1,4 @@
 ChangeLog
-MANIFEST
-MANIFEST.SKIP
-Makefile.PL
-README
-TODO.txt
 lib/Text/Unidecode.pm
 lib/Text/Unidecode/x00.pm
 lib/Text/Unidecode/x01.pm
@@ -185,4 +180,23 @@ lib/Text/Unidecode/xfc.pm
 lib/Text/Unidecode/xfd.pm
 lib/Text/Unidecode/xfe.pm
 lib/Text/Unidecode/xff.pm
-test.pl
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/01_hello_world.t
+t/02_xbrace_syntax.t
+t/03_wideness.t
+t/04_just_load_module.t
+t/05_test_loading.t
+t/10_note_incs.t
+t/15_generate_no_warnings.t
+t/20_uniform_table_sizes.t
+t/30_misc_unihan.t
+t/40_misc_errors_fixed.t
+t/50_main.t
+t/99_bye.t
+TODO.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

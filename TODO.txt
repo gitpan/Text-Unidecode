@@ -1,10 +1,45 @@
-Text::Unidecode Transliteration Notes -- TODO FILE
+# -*-coding:utf-8;-*- ··················································
+# Last Modified Time-stamp: "2014-06-13 03:39:11 MDT sburke@cpan.org"
+#======================================================================
+
+	      ~~  Text::Unidecode TODO file  ~~
+
+TODO:
+
+Populate 0x80-0x9F with their values from Win-1252.
+
+TODO:
+
+Make it handle stuff in hyperspace (over U+FFFF)
+
+TODO:
+
+THEN re-run the thing that reads the Unihan database and generates
+all the Text/Unidecode/__.pm files.
+(Do the hyperspace handling first, because lots of Unihan
+stuff is up there.)
+
+TODO:
+
+Look to see whether I need to deal with the Arabic stuff in
+the U+FBxx etc blocks.  I thought it was always just
+font-internal stuff, but I'm starting to suspect that it may
+be encountered in the real world
+
+TODO:
+
+Of course:
+- Check for new glyphs in existing tables.
+- Look at whole new tables (like the Philippine scripts) in
+normal space (x < U+FFFF)
+- Look at the wild wilderness in hyperspace (x > U+FFFF
 
 
+======================================================================
+======================================================================
 
-============================== BLOCK 03 ==============================
-
-Coptic things I'm unsure of: Khei=kh, Gangia=g, Shima=ch, Dei=ti.
+########################################################################
+Below here is TODOs from the Unicode version in 2001.  Yes, that long ago.
 
 
 ============================== BLOCK 09 ==============================
@@ -98,6 +133,5 @@ Arabic Presentation Forms-B (FE70-FEFF) -- do I need to
 do these, or are they never actually found in text files?
 
 
-
---
-26 TODOs at Sat Jul 14 00:27:44 2001
+======================================================================
+(end)

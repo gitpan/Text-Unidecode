@@ -1,6 +1,21 @@
-Revision history for Perl module Text::Unidecode
-                                        Time-stamp: "2001-07-14 02:28:13 MDT"
+# -*-coding:utf-8;-*- ··················································
+# Last Modified Time-stamp: "2014-06-13 19:01:41 MDT sburke@cpan.org"
+#======================================================================
 
+Revision history for Perl module Text::Unidecode
+
+2014-06-13   Sean M. Burke  sburke@cpan.org
+	* !DEVELOPER RELEASE!
+	* Release 1.00(_01!)- so many years later, finally we bump up to 1.*!
+
+	* My documentation is now BRILLIANT.
+	* Minor bugfixes.
+	* Some code comments for clarity.
+	* A modern test suite.
+
+	* A proper release will follow in a few days.
+	
+	
 2001-07-14  Sean M. Burke  sburke@cpan.org
 	
 	* Release 0.04 -- forgot to put TODO.txt in 0.03.  Now including

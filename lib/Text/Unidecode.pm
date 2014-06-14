@@ -1,18 +1,19 @@
 
 require 5.006;
-package Text::Unidecode;  # Time-stamp: "2001-07-14 02:29:41 MDT"
+package Text::Unidecode;  # Time-stamp: "2014-06-13 17:42:11 MDT sburke@cpan.org"
 use utf8;
 use strict;
 use integer; # vroom vroom!
-use vars qw($VERSION @ISA @EXPORT @Char $NULLMAP);
-$VERSION = '0.04';
+use vars qw($VERSION @ISA @EXPORT @Char $UNKNOWN $NULLMAP $TABLE_SIZE);
+$VERSION = '1.00_01';
 require Exporter;
 @ISA = ('Exporter');
 @EXPORT = ('unidecode');
 
 BEGIN { *DEBUG = sub () {0} unless defined &DEBUG }
-
-$NULLMAP = [('[?] ') x 0x100];  # for blocks we can't load
+$UNKNOWN = '[?] ';
+$TABLE_SIZE = 256;
+$NULLMAP = [( $UNKNOWN ) x $TABLE_SIZE];  # for blocks we can't load
 
 #--------------------------------------------------------------------------
 {
@@ -25,22 +26,75 @@ $NULLMAP = [('[?] ') x 0x100];  # for blocks we can't load
 sub unidecode {
   # Destructive in void context -- in other contexts, nondestructive.
 
-  unless(@_) {
-    # Nothing coming in
+  unless(@_) {  # Sanity: Nothing coming in!
     return() if wantarray;
     return '';
   }
-  @_ = map $_, @_ if defined wantarray;
-   # We're in list or scalar context, NOT void context.
-   #  So make @_'s items no longer be aliases.
-   # Otherwise, let @_ be aliases, and alter in-place.
 
-  foreach my $x (@_) {
-    next unless defined $x;    
-    $x =~ s~([^\x00-\x7f])~${$Char[ord($1)>>8]||t($1)}[ord($1)&255]~egs;
-      # Replace character 0xABCD with $Char[0xAB][0xCD], loading
-      #  the table as needed.
+  if( defined wantarray ) {
+    # We're in list or scalar context (i.e., just not void context.)
+    #  So make @_'s items no longer be aliases.
+    @_ = map $_, @_;
+  } else {
+    # Otherwise (if we're in void context), then just let @_ stay
+    #  aliases, and alter their elements IN-PLACE!
   }
+
+  foreach my $n (@_) {
+    next unless defined $n;    
+    $n =~ s~([^\x00-\x7f])~${$Char[ord($1)>>8]||t($1)}[ord($1)&255]~egs;
+  }
+  # Replace character 0xABCD with $Char[0xAB][0xCD], loading
+  #  the table as needed.
+  #
+  #======================================================================
+  #
+  # Yes, that's dense code.  It's the warp core!
+  # Here is an expansion into pseudocode... as best as I can manage it...
+  #
+  #   
+  #  
+  #     $character = $1;
+  #     $charnum = ord($character);
+  #     $charnum_lowbits  = $charnum & 255;
+  #     $charnum_highbits = $charnum >> 8;
+  #  
+  #     $table_ref = $Char->[$charnum_highbits];
+  #  
+  #     if($table_ref) {
+  #       # As expected, we got the arrayref for this table.
+  #     } else {
+  #       # Uhoh, we couldn't find the arrayref for this table.
+  #       # So we call t($character).
+  #       #  It loads a table.  Namely, it does:
+  #       Load_Table_For( $charnum_highbits );
+  #        # ...which does magic, and puts something in
+  #        #     $Char->[$charnum_highbits],
+  #        #     so NOW we actually CAN do:
+  #       $table_ref = $Char->[$charnum_highbits];
+  #     }
+  #     
+  #     $for_this_char
+  #       = $table_ref->[ $charnum_lowbits ];
+  #
+  #     # Although the syntax we actually use is the odd
+  #      but COMPLETE EQUIVALENT to this syntax:
+  #  
+  #     $for_this_char
+  #       = ${ $table_ref }[ $charnum_lowbits ];
+  #     
+  #     and $for_this_char is the replacement text for this
+  #      character, in:
+  #      $n =~ s~(char)~replacement~egs
+  #
+  #  (And why did I use s~x~y~ instead of s/x/y/ ?
+  #  It's all the same for Perl: perldoc perlretut says:
+  #       As with the match "m//" operator, "s///" can 
+  #       use other delimiters, such as "s!!!" and "s{}{}", 
+  #  I didn't do it for sake of obscurity. I think it's just to
+  #  keep my editor's syntax highlighter from crashing,
+  #  which was a problem with s///
+  #
 
   return unless defined wantarray; # void context
   return @_ if wantarray;  # normal list context -- return the copies
@@ -49,60 +103,91 @@ sub unidecode {
   return join '', @_;      # rarer fallthru: a list in, but a scalar out.
 }
 
-sub t {
- # load (and return) a char table for this character
- # this should get called only once per table per session.
- my $bank = ord($_[0]) >> 8;
- return $Char[$bank] if $Char[$bank];
- 
-        {
-           DEBUG and printf "Loading %s::x%02x\n", __PACKAGE__, $bank;
-           local $SIG{'__DIE__'};
-           eval(sprintf 'require %s::x%02x;', __PACKAGE__, $bank);
-        }
+#======================================================================
+
+sub t {   # "t" is for "t"able.
+  # Load (and return) a char table for this character
+  # this should get called only once per table per session.
+  my $bank = ord($_[0]) >> 8;
+  return $Char[$bank] if $Char[$bank];
+  
+  {
+    DEBUG and printf "Loading %s::x%02x\n", __PACKAGE__, $bank;
+    local $SIG{'__DIE__'};
+    eval(sprintf 'require %s::x%02x;', __PACKAGE__, $bank);
+  }
         
-        # Now see how that fared...
-        if(ref($Char[$bank] || '') ne 'ARRAY') {
-          DEBUG > 1 and print
-            " Loading failed for bank $bank (err $@).  Using null map.\n";
-          return $Char[$bank] = $NULLMAP;
-        } else {
-          DEBUG > 1 and print " Succeeded.\n";
-          if(DEBUG) {
-            # Sanity-check it:
-            my $cb = $Char[$bank];
-            unless(@$cb == 256) {
-              printf "Block x%02x is of size %d -- chopping to 256\n",
-                  scalar(@$cb);
-              $#$cb = 255;   # pre-extend the array, or chop it to size.
-            }
-            for(my $i = 0; $i < 256; ++$i) {
-              unless(defined $cb->[$i]) {
-                printf "Undef at position %d in block x%02x\n",
-                  $i, $bank;
-                $cb->[$i] = '';
-              }
-            }
-          }
-          return $Char[$bank];
-        }
+  # Now see how that fared...
+
+  if(ref($Char[$bank] || '') ne 'ARRAY') {
+    DEBUG > 1 and print
+      " Loading failed for bank $bank (err $@).  Using null map.\n";
+    return $Char[$bank] = $NULLMAP;
+  }
+
+
+  DEBUG > 1 and print " Loading succeeded.\n";
+  my $cb = $Char[$bank];
+
+  # Sanity-check it:
+  if(@$cb == $TABLE_SIZE) {
+    # As expected.  Fallthru.
+
+  } else {
+    if(@$cb > $TABLE_SIZE) {
+      DEBUG and print "Bank $bank is too large-- it has ", scalar @$cb,
+        " entries in it.  Pruning.\n";
+      splice @$cb, $TABLE_SIZE;
+       # That two-argument form splices everything off into nowhere,
+       #  starting with the first overage character.
+
+    } elsif( @$cb < $TABLE_SIZE) {
+      DEBUG and print "Bank $bank is too small-- it has ", scalar @$cb,
+        " entries in it.  Now padding it.\n";
+      if(@$cb == 0) {
+        DEBUG and print "  (Yes, ZERO entries!)\n";
+      }
+      push @$cb,
+	  ( $UNKNOWN )  x  ( $TABLE_SIZE - @$cb)
+	  # i.e., however many items, times the deficit
+      ;
+      # And fallthru...
+
+    } else {
+      die "UNREACHABLE CODE HERE (INSANE)";
+    }
+  }
+
+  # Check for undefness in block:
+
+  for(my $i = 0; $i < $TABLE_SIZE; ++$i) {
+    unless(defined $cb->[$i]) {
+      DEBUG and printf "Undef at position %d in block x%02x\n",
+        $i, $bank;
+      $cb->[$i] = '';
+    }
+  }
+
+  return $Char[$bank];
 }
 
 #--------------------------------------------------------------------------
 1;
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
-Text::Unidecode -- US-ASCII transliterations of Unicode text
+Text::Unidecode -- plain ASCII transliterations of Unicode text
 
 =head1 SYNOPSIS
 
   use utf8;
   use Text::Unidecode;
   print unidecode(
-    "\x{5317}\x{4EB0}\n"
-     # those are the Chinese characters for Beijing
+    "北亰\n"
+    # Chinese characters for Beijing (U+5317 U+4EB0)
   );
   
   # That prints: Bei Jing 
@@ -110,7 +195,7 @@ Text::Unidecode -- US-ASCII transliterations of Unicode text
 =head1 DESCRIPTION
 
 It often happens that you have non-Roman text data in Unicode, but
-you can't display it -- usually because you're trying to
+you can't display it-- usually because you're trying to
 show it to a user via an application that doesn't support Unicode,
 or because the fonts you need aren't accessible.  You could
 represent the Unicode characters as "???????" or
@@ -121,19 +206,34 @@ What Text::Unidecode provides is a function, C<unidecode(...)> that
 takes Unicode data and tries to represent it in US-ASCII characters
 (i.e., the universally displayable characters between 0x00 and
 0x7F).  The representation is
-almost always an attempt at I<transliteration> -- i.e., conveying,
+almost always an attempt at I<transliteration>-- i.e., conveying,
 in Roman letters, the pronunciation expressed by the text in
 some other writing system.  (See the example in the synopsis.)
 
-Unidecode's ability to transliterate is limited by two factors:
+
+NOTE:
+
+To make sure your perldoc/Pod viewing setup for viewing this page is
+working: The six-letter word "résumé" should look like "resume" with
+an "/" accent on each "e".
+
+For further tests, and help if that doesn't work, see below,
+L</A POD ENCODING TEST>.
+
+
+=head1 DESIGN PHILOSOPHY
+
+Unidecode's ability to transliterate from a given language is limited
+by two factors:
 
 =over
 
-=item * The amount and quality of data in the original
+=item * The amount and quality of data in the written form of the
+original language
 
 So if you have Hebrew data
 that has no vowel points in it, then Unidecode cannot guess what
-vowels should appear in a pronounciation.
+vowels should appear in a pronunciation.
 S f y hv n vwls n th npt, y wn't gt ny vwls
 n th tpt.  (This is a specific application of the general principle
 of "Garbage In, Garbage Out".)
@@ -182,7 +282,7 @@ This returns a copy of $in, transliterated.
 
 =item C<$out = unidecode(@in);> # scalar context
 
-This is the same as C<$out = unidecode(join '', @in);>
+This is the same as C<$out = unidecode(join "", @in);>
 
 =item C<@out = unidecode(@in);> # list context
 
@@ -201,9 +301,10 @@ is the same as C<for(@bar, $foo, @baz) { $_ = unidecode($_) }>
 You should make a minimum of assumptions about the output of
 C<unidecode(...)>.  For example, if you assume an all-alphabetic
 (Unicode) string passed to C<unidecode(...)> will return an all-alphabetic
-string, you're wrong -- some alphabetic Unicode characters are
+string, you're wrong-- some alphabetic Unicode characters are
 transliterated as strings containing punctuation (e.g., the
-Armenian letter at 0x0539 currently transliterates as C<T`>.
+Armenian letter "Թ" (U+0539), currently transliterates as "T`"
+(capital-T then a backtick).
 
 However, these are the assumptions you I<can> make:
 
@@ -217,7 +318,7 @@ C<unidecode(...)> is 7-bit pure.
 =item *
 
 The output of C<unidecode(...)> always consists entirely of US-ASCII
-characters -- i.e., characters 0x0000 - 0x007F.
+characters-- i.e., characters 0x0000 - 0x007F.
 
 =item *
 
@@ -228,9 +329,9 @@ you have a "\x01" on input, you'll get a "\x01" in output.)
 
 =item *
 
-Yes, some transliterations produce a "\n" -- but just a few, and only
-with good reason.  Note that the value of newline ("\n") varies
-from platform to platform -- see L<perlport/perlport>.
+Yes, some transliterations produce a "\n" but it's just a few, and
+only with good reason.  Note that the value of newline ("\n") varies
+from platform to platform-- see L<perlport>.
 
 =item *
 
@@ -239,15 +340,22 @@ Some Unicode characters may transliterate to nothing (i.e., empty string).
 =item *
 
 Very many Unicode characters transliterate to multi-character sequences.
-E.g., Han character 0x5317 transliterates as the four-character string
+E.g., Unihan character U+5317, "北", transliterates as the four-character string
 "Bei ".
 
 =item *
 
-Within these constraints, I may change the transliteration of characters
+Within these constraints, I<I may change> the transliteration of characters
 in future versions.  For example, if someone convinces me that
-the Armenian letter at 0x0539, currently transliterated as "T`", would
-be better transliterated as "D", I may well make that change.
+that the Armenian letter "Թ", currently transliterated as "T`", would
+be better transliterated as "D", I I<may> well make that change.
+
+=item *
+
+Unfortunately, there are many characters that Unidecode doesn't know a
+transliteration for.  This is generally because the character has been
+added since I last revised the Unidecode data tables.  I'm always
+catching up!
 
 =back
 
@@ -255,15 +363,19 @@ be better transliterated as "D", I may well make that change.
 
 Text::Unidecode is meant to be a transliterator-of-last resort,
 to be used once you've decided that you can't just display the
-Unicode data as is, and once you've decided you don't have a
-more clever, language-specific transliterator available.  It
-transliterates context-insensitively -- that is, a given character is
+Unicode data as is, I<and once you've decided you don't have a
+more clever, language-specific transliterator available,> or once
+you've I<already applied> a smarter algorithm and now just want Unidecode
+to do cleanup.
+
+Unidecode
+transliterates context-insensitively-- that is, a given character is
 replaced with the same US-ASCII (7-bit ASCII) character or characters,
-no matter what the surrounding character are.
+no matter what the surrounding characters are.
 
 The main reason I'm making Text::Unidecode work with only
 context-insensitive substitution is that it's fast, dumb, and
-straightforward enough to be feasable.  It doesn't tax my
+straightforward enough to be feasible.  It doesn't tax my
 (quite limited) knowledge of world languages.  It doesn't require
 me writing a hundred lines of code to get the Thai syllabification
 right (and never knowing whether I've gotten it wrong, because I
@@ -275,11 +387,11 @@ moreover, context-insensitive substitution is still mostly useful,
 but still clearly couldn't be mistaken for authoritative.
 
 Text::Unidecode is an example of the 80/20 rule in
-action -- you get 80% of the usefulness using just 20% of a
+action-- you get 80% of the usefulness using just 20% of a
 "real" solution.
 
 A "real" approach to transliteration for any given language can
-involve such increasingly tricky contextual factors as these
+involve such increasingly tricky contextual factors as these:
 
 =over
 
@@ -292,7 +404,7 @@ by some diacritic character.
 =item Syllables
 
 A character "X" at end of a syllable could mean something
-different from when it's at the start -- which is especially problematic
+different from when it's at the start-- which is especially problematic
 when the language involved doesn't explicitly mark where one syllable
 stops and the next starts.
 
@@ -332,12 +444,71 @@ Out of a desire to avoid being mired in I<any> of these kinds of
 contextual factors, I chose to exclude I<all of them> and just stick
 with context-insensitive replacement.
 
+
+=head1 A POD ENCODING TEST
+
+=over
+
+=item *
+
+"Brontë" is six characters that should look like "Bronte", but
+with double-dots on the "e" character.
+
+=item *
+
+"Résumé" is six characters that should look like "Resume", but
+with /-shaped accents on the "e" characters.
+
+=item *
+
+"χρονος" is six Greek characters that should look kind of like: xpovoc
+
+=item *
+
+"КАК ВАС ЗОВУТ" is three short Russian words that should look a
+lot like: KAK BAC 3OBYT
+
+=item *
+
+"ടധ" is two Malayalam characters that should look like: sw
+
+=item *
+
+"丫二十一" is four Chinese characters that should look like: C<Y=+->
+
+=back
+
+If all of those come out right, your Pod viewing setup is working
+fine-- welcome to the 2010s!  If those are full of garbage characters,
+consider viewing this page as HTML at
+L<http://search.cpan.org/perldoc?Text::Unidecode>
+
+If things look mostly okay, but the Malayalam and/or the Chinese are
+just question-marks or empty boxes, it's probably just that your
+computer lacks the fonts for those.
+
 =head1 TODO
 
-Things that need tending to are detailed in the TODO.txt file, included
-in this distribution.  Normal installs probably don't leave the TODO.txt
-lying around, but if nothing else, you can see it at
-http://search.cpan.org/search?dist=Text::Unidecode
+Lots:
+
+* Rebuild the Unihan database.  (Talk about hitting a moving target!)
+
+* Add tone-numbers for Mandarin hanzi?  Namely: In Unihan, when tone
+marks are present (like in "kMandarin: dào", should I continue to
+transliterate as just "Dao", or should I put in the tone number:
+"Dao4"?  It would be pretty jarring to have digits appear where
+previously there was just alphabetic stuff-- But tone numbers
+make Chinese more readable.
+
+* Start dealing with characters over U+FFFF.
+
+* Fill in all the little characters that've crept into the Misc Symbols
+Etc blocks.
+
+* More things that need tending to are detailed in the TODO.txt file,
+included in this distribution.  Normal installs probably don't leave
+the TODO.txt lying around, but if nothing else, you can see it at
+L<http://search.cpan.org/search?dist=Text::Unidecode>
 
 =head1 MOTTO
 
@@ -345,26 +516,141 @@ The Text::Unidecode motto is:
 
   It's better than nothing!
 
-...in both meanings: 1) seeing the output of C<unidecode(...)> is
+...in I<both> meanings: 1) seeing the output of C<unidecode(...)> is
 better than just having all font-unavailable Unicode characters
 replaced with "?"'s, or rendered as gibberish; and 2) it's the
 worst, i.e., there's nothing that Text::Unidecode's algorithm is
-better than.
+better than.  All sensible transliteration algorithms (like for
+German, see below) are going to be smarter than Unidecode's.
+
+=head1 WHEN YOU DON'T LIKE WHAT UNIDECODE DOES
+
+I will repeat the above, because some people miss it:
+
+Text::Unidecode is meant to be a transliterator of I<last resort,>
+to be used once you've decided that you can't just display the
+Unicode data as is, I<and once you've decided you don't have a
+more clever, language-specific transliterator available>-- or once
+you've I<already applied> a smarter algorithm and now just want Unidecode
+to do cleanup.
+
+In other words, when you don't like what Unidecode does, I<do it
+yourself.>  Really, that's what the above says.  Here's how
+you would do this for German, for example:
+
+In German, there's the typographical convention that an umlaut (the
+double-dots on: ä ö ü) can be written as an "-e", like with "Schön"
+becoming "Schoen".  But Unidecode doesn't do that-- I have Unidecode
+simply drop the umlaut accent and give back "Schon".
+
+(I chose this not because I'm a big meanie, but because
+I<generally> changing "ü" to "ue" is disastrous for all text
+that's I<not in German>.  Finnish "Hyvää päivää" would turn
+into "Hyvaeae paeivaeae".  And I discourage you from being I<yet
+another> German who emails me, trying to impel me to consider
+a typographical nicety of German to be more important than
+I<all other languages>.)
+
+If you know that the text you're handling is probably in German, and
+you want to apply the "umlaut becomes -e" rule, here's how to do it
+for yourself (and then use Unidecode as I<the fallback> afterwards):
+
+  our( %German_Characters ) = qw(
+   Ä AE   ä ae
+   Ö OE   ö oe
+   Ü UE   ü ue
+   ß ss 
+  );
+  
+  use Text::Unidecode qw(unidecode);
+  
+  sub german_to_ascii {
+    my($german_text) = @_;
+    
+    $german_text =~
+      s/([ÄäÖöÜüß])/$German_Characters{$1}/g;
+    
+    # And now, as a *fallthrough*:
+    $german_text = unidecode( $german_text );
+    return $german_text;
+  }
+
+To pick another example, here's something that's not about a
+specific language, but simply having a preference that may or
+may not agree with Unidecode's (i.e., mine).  Consider the "¥"
+symbol.  Unidecode changes that to "Y=".  If you want "¥" as
+"YEN", then...
+
+  use Text::Unidecode qw(unidecode);
+
+  sub my_favorite_unidecode {
+    my($text) = @_;
+    
+    $text =~ s/¥/YEN/g;
+    
+    # ...and anything else you like, such as:
+    $text =~ s/€/Euro/g;
+    
+    # And then, as a fallback,...
+    $text = unidecode($text);
+     
+    return $text;    
+  }
+
+Then if you do:
+
+  print my_favorite_unidecode("You just won ¥250,000 and €40,000!!!");
+
+...you'll get:
+
+  You just won YEN250,000 and Euro40,000!!!
+
+...just as you like it.
+
+(By the way, the reason I<I> don't have Unidecode just turn "¥" into "YEN"
+is that the same symbol also stands for yuan, the Chinese
+currency.  A "Y=" is nicely, I<safely> neutral as to whether
+we're talking about yen or yuan-- Japan, or China.)
+
+Another example: for hanzi/kanji/hanja, I have designed
+Unidecode to transliterate according to the value that that
+character has in Mandarin (otherwise Cantonese,...).  Some
+users have complained that applying Unidecode to Japanese
+produces gibberish.
+
+To make a long story short: transliterating from Japanese is
+I<difficult> and it requires a I<lot> of context-sensitivity.
+If you have text that you're fairly sure is in
+Japanese, you're going to have to use a Japanese-specific
+algorithm to transliterate Japanese into ASCII.  (And then
+you can call Unidecode on the output from that-- it is useful
+for, for example, turning ｆｕｌｌｗｉｄｔｈ characters into
+their normal (ASCII) forms.
 
 =head1 CAVEATS
 
 If you get really implausible nonsense out of C<unidecode(...)>, make
 sure that the input data really is a utf8 string.  See
-L<perlunicode/perlunicode>.
+L<perlunicode> and L<perlunitut>.
 
 =head1 THANKS
 
-Thanks to Harald Tveit Alvestrand,
-Abhijit Menon-Sen, and Mark-Jason Dominus.
+Thanks to (in only the sloppiest of sorta-chronological order): Harald
+Tveit Alvestrand, Abhijit Menon-Sen, Mark-Jason Dominus, Joe Johnston,
+Philip Newton, 唐鳳, Tomaž Šolc, Mike Doherty, JT Smith and the
+MadMongers, and I<many> other pals in Unicode's behind-the-scenes F5
+tornado underlying its code.
 
 =head1 SEE ALSO
 
-Unicode Consortium: http://www.unicode.org/
+An article I wrote for I<The Perl Journal> about
+Unidecode:  L<http://interglacial.com/tpj/22/>
+(B<READ IT!>)
+
+Unicode Consortium: L<http://www.unicode.org/>
+
+Searchable Unihan database:
+L<http://www.unicode.org/cgi-bin/GetUnihanData.pl>
 
 Geoffrey Sampson.  1990.  I<Writing Systems: A Linguistic Introduction.>
 ISBN: 0804717567
@@ -378,9 +664,12 @@ Congress.]
 Rupert Snell.  2000.  I<Beginner's Hindi Script (Teach Yourself
 Books).>  ISBN: 0658009109
 
-=head1 COPYRIGHT AND DISCLAIMERS
+=head1 LICENSE
 
-Copyright (c) 2001 Sean M. Burke. All rights reserved.
+Copyright (c) 2001, 2014 Sean M. Burke.
+
+Unidecode is distributed under the Perl Artistic License
+( L<perlartistic> ), namely:
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -389,8 +678,15 @@ This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of
 merchantability or fitness for a particular purpose.
 
+=head1 DISCLAIMER
+
 Much of Text::Unidecode's internal data is based on data from The
-Unicode Consortium, with which I am unafiliated.
+Unicode Consortium, with which I am unaffiliated.
+
+The views and conclusions contained in the software and documentation
+are those of the authors/contributors and should not be interpreted as
+representing official policies, either expressed or implied, of The
+Unicode Consortium.
 
 =head1 AUTHOR
 
@@ -429,4 +725,3 @@ The lyrics are:
 	and punctuation we adore!
 
 # End.
-
