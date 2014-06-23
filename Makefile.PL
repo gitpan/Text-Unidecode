@@ -1,5 +1,5 @@
 # This -*-perl-*- script writes the Makefile for installing this distribution.
-# ( Last Modified Time-stamp: "2014-06-13 18:51:55 MDT sburke@cpan.org" )
+# ( Last Modified Time-stamp: "2014-06-17 19:30:16 MDT sburke@cpan.org" )
 #======================================================================
 #
 # For info on instaling this module and how to control it, see:
@@ -11,11 +11,18 @@
 #
 #======================================================================
 
-require 5.006;
-use ExtUtils::MakeMaker;
+require                   5.008_000;  #   # <==========!!!!!!!!!!
+my $min_perl_version =    5.008_000;  #   # <==========!!!!!!!!!!
 
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
+# For the module author: see lib/ExtUtils/MakeMaker.pm for details
+#   of how to influence the contents of the Makefile that is written.
+# Incidentally. Perldoc perlfunc says "use " is compile-time, but
+#   "require 5.6" is runtime.
+
+use ExtUtils::MakeMaker;
+#if( $ExtUtils::MakeMaker::VERSION < 6.47 ) {
+#  die "I need at least perl version $min_perl_version";
+#}
 
 WriteMakefile(
   'NAME'         => 'Text::Unidecode',
@@ -26,6 +33,15 @@ WriteMakefile(
   'AUTHOR'       => 'Sean Burke <sburke@cpan.org>',
   'LICENSE'      => 'perl',
                    #  "...under the same terms as Perl itself"
+
+  ($ExtUtils::MakeMaker::VERSION >= 6.47
+    ? ('MIN_PERL_VERSION' => $min_perl_version )
+
+    : () # Otherwise we can't express that metadata about this
+         #  whole module suite, and we just have to let the version
+         #  "require" thing up there block this whole Makefile.PL
+         #  from running.
+  ),
 
   'dist'  => {
      'COMPRESS' => 'gzip -4f',

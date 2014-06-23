@@ -1,8 +1,8 @@
-
-require 5; # -*-mode:CPerl-*-
+# -*- coding:utf-8; mode:CPerl -*-
+use 5.8.0;
 use Test; use strict; use warnings;
 BEGIN { plan tests => 11 };
-print q[# // Time-stamp: "2013-11-24 19:41:19 MST sburke@cpan.org"], "\n";
+print q[# // Time-stamp: "2014-06-17 18:29:00 MDT sburke@cpan.org"], "\n";
 
 # Summary of, well, things.
 ok 1; print "# ^-- Hello\n";
@@ -32,5 +32,5 @@ ok "a", unidecode("a"); print "# ^-- sanity\n";
   #$n = unidecode( $s=chr($i=0x10000) ); ok $n; printf $f, $n, $s, $i;
 }
 
+print "# Bye:\n";
 ok 1;
-print "# ^-- Bye\n";

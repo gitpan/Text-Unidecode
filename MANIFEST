@@ -185,18 +185,21 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 README
-t/01_hello_world.t
-t/02_xbrace_syntax.t
-t/03_wideness.t
-t/04_just_load_module.t
-t/05_test_loading.t
-t/10_note_incs.t
-t/15_generate_no_warnings.t
-t/20_uniform_table_sizes.t
-t/30_misc_unihan.t
-t/40_misc_errors_fixed.t
-t/50_main.t
-t/99_bye.t
+t/00010_hello_world.t
+t/00050_assert_perl_version.t
+t/00055_can_utf8.t
+t/00100_can_binmode.t
+t/00200_xbrace_syntax.t
+t/00300_wideness.t
+t/00400_just_load_module.t
+t/00500_test_loading.t
+t/01000_note_incs.t
+t/01500_generate_no_warnings.t
+t/02000_uniform_table_sizes.t
+t/03000_misc_unihan.t
+t/04000_misc_errors_fixed.t
+t/05000_main.t
+t/09900_bye.t
 TODO.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

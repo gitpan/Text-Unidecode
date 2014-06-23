@@ -1,9 +1,23 @@
-# -*-coding:utf-8;-*- ··················································
-# Last Modified Time-stamp: "2014-06-13 19:01:41 MDT sburke@cpan.org"
+ -*-coding:utf-8;-*- ··················································
+ Last Modified Time-stamp: "2014-06-23 03:44:43 MDT sburke@cpan.org"
 #======================================================================
 
 Revision history for Perl module Text::Unidecode
 
+2014-06-23   Sean M. Burke  sburke@cpan.org
+	* !DEVELOPER RELEASE!
+	* Release 1.00_03
+	* Now asserting that we need at least Perl 5.8.0
+	An automated test system that tried running the t/*.t
+        under a 5.6.2 spewed all kinds of crazy error messages.
+	Hence the bump-up.
+	So, I added assertions for the version.
+	* I added some tests for more basic sanity assertions.
+
+2014-06-17   Sean M. Burke  sburke@cpan.org
+	v1.00_02 - Not released.  Just internal rearranging.
+
+	
 2014-06-13   Sean M. Burke  sburke@cpan.org
 	* !DEVELOPER RELEASE!
 	* Release 1.00(_01!)- so many years later, finally we bump up to 1.*!

@@ -1,6 +1,6 @@
 # -*- coding:utf-8; mode:CPerl -*-
-require 5; use Test; use strict; use warnings; use utf8;
-print q[# //Time-stamp: "2014-01-24 23:56:23 MST sburke@cpan.org"], "\n";
+use 5.8.0; use Test; use strict; use warnings; use utf8;
+print q[# //Time-stamp: "2014-06-17 18:02:32 MDT sburke@cpan.org"], "\n";
 
 BEGIN {plan tests => 7};
 

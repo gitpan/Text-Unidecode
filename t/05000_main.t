@@ -1,16 +1,17 @@
 # -*- coding:utf-8; mode:CPerl -*-
-require 5; use Test; use strict; use warnings; use utf8;
-print q[# //Time-stamp: "2014-06-13 04:43:49 MDT sburke@cpan.org"], "\n";
+use 5.8.0;
+use strict; use warnings; use Test;
+print q[# //Time-stamp: "2014-06-17 18:52:58 MDT sburke@cpan.org"], "\n";
 
 BEGIN { plan tests => 20; }
-
+use utf8;
 use Text::Unidecode;
 
 ok 1; print "# ^-- Hello\n";
 
 print "# Text::Unidecode v$Text::Unidecode::VERSION\n",
-      "# Perl v$]\n",
-      "# File " . __FILE__ . "\n",
+      "# Perl $^V\n",
+      "# I am test file " . __FILE__ . "\n",
       "# Starting tests...\n";
 
 ok binmode(*STDOUT, ":utf8"); print "# ^-- Testing binmode on STDOUT\n";
@@ -60,5 +61,5 @@ ok $be, "mlyaalm", ($from= "മലയാലമ്");
 print "# Japanese, astonishingly unmangled...\n";
 ok $be, "genmaiCha ", ($from="げんまい茶");   # 
 
-print "#Bye...\n";
+print "# Bye:\n";
 ok 1;

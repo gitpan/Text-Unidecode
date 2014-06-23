@@ -1,11 +1,12 @@
 
-require 5.006;
-package Text::Unidecode;  # Time-stamp: "2014-06-13 17:42:11 MDT sburke@cpan.org"
+require 5;
+use 5.8.0;
+package Text::Unidecode;  # Time-stamp: "2014-06-23 03:40:17 MDT sburke@cpan.org"
 use utf8;
 use strict;
 use integer; # vroom vroom!
 use vars qw($VERSION @ISA @EXPORT @Char $UNKNOWN $NULLMAP $TABLE_SIZE);
-$VERSION = '1.00_01';
+$VERSION = '1.00_03';
 require Exporter;
 @ISA = ('Exporter');
 @EXPORT = ('unidecode');

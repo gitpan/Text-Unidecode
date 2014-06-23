@@ -1,12 +1,10 @@
-
-require 5; # -*-mode:CPerl-*-
-use Test; use strict; use warnings;
+# -*- coding:utf-8; mode:CPerl -*-
+use 5.8.0; use strict; use warnings; use Test;
 BEGIN {plan tests => 12};
-print q[# // Time-stamp: "2014-01-24 23:40:23 MST sburke@cpan.org"], "\n";
+print q[# // Time-stamp: "2014-06-17 23:35:22 MDT sburke@cpan.org"], "\n";
 
 # Summary of, well, things.
 ok 1;
-use utf8;
 
 use Text::Unidecode;
 ok "a", unidecode("a");
@@ -14,17 +12,16 @@ ok "a", unidecode("a");
 {
   my($i, $n);
   my $f = "# ^-- \"%s\" (U+%04x)\n";
+  print "# These cause loading of those modules...\n";
   $n = unidecode( chr($i=0x0100) ); ok $n; printf $f, $n, $i;
   $n = unidecode( chr($i=0x0400) ); ok $n; printf $f, $n, $i;
   $n = unidecode( chr($i=0x0f00) ); ok $n; printf $f, $n, $i;
   $n = unidecode( chr($i=0xff00) ); ok $n; printf $f, $n, $i;
 }
 
-# Now let's see the symbol table, then especially %INC...
-
-
 ok 1;
-print "#\n#\n#\n# Now the symbol table:\n#\n";
+print "#\n# Now that we've loaded Text::Unidecode, let's see what else is\n",
+      "#  in \%INC by now...\n";
 {
   my @out;
   push @out,
@@ -101,6 +98,6 @@ foreach my $x (sort {lc($a) cmp lc($b)} keys %INC) {
 
 ok 1;
 
-print "#\n#\n# Bye\n";
+print "#\n#\n# Bye:\n";
 ok 1;
 

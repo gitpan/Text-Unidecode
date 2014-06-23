@@ -1,5 +1,5 @@
 		# -*- coding:utf-8; mode:Text; fill-column:79 -*-
-		# Time-stamp: "2014-06-13 19:01:57 MDT sburke@cpan.org"
+		# Time-stamp: "2014-06-17 17:23:26 MDT sburke@cpan.org"
 # (This page is in UTF-8!) |··················································|
 
 Module:  Text::Unidecode-- make ASCII transliterations of Unicode text
@@ -23,8 +23,8 @@ An article about how Unidecode runs:
     http://interglacial.com/tpj/22/
 
 REQUIREMENTS
-This module requires Perl 5.6.0 at the very least.  That's probably not a
-problem for you, since that's from a million years ago.
+This module requires Perl 5.8.0 at the very least.  That's probably not a
+problem for you, since that's from a decade ago!
 
 INSTALLATION
 * For using the "CPAN Plus" system, read:   perldoc cpanp
