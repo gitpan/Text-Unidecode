@@ -1,9 +1,15 @@
  -*-coding:utf-8;-*- ··················································
- Last Modified Time-stamp: "2014-06-23 03:44:43 MDT sburke@cpan.org"
+ Last Modified Time-stamp: "2014-06-30 01:47:56 MDT sburke@cpan.org"
 #======================================================================
 
 Revision history for Perl module Text::Unidecode
 
+2014-06-30   Sean M. Burke  sburke@cpan.org
+	* Release 1.01 -- first official Unidecode release since 2001!!!
+	* There are no real changes since the 2014-06-23 developer
+	release.  I'm just making this all official now.
+	
+	
 2014-06-23   Sean M. Burke  sburke@cpan.org
 	* !DEVELOPER RELEASE!
 	* Release 1.00_03
@@ -13,10 +19,10 @@ Revision history for Perl module Text::Unidecode
 	Hence the bump-up.
 	So, I added assertions for the version.
 	* I added some tests for more basic sanity assertions.
-
+	
 2014-06-17   Sean M. Burke  sburke@cpan.org
 	v1.00_02 - Not released.  Just internal rearranging.
-
+	
 	
 2014-06-13   Sean M. Burke  sburke@cpan.org
 	* !DEVELOPER RELEASE!

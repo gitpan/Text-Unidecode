@@ -1,12 +1,13 @@
+;;;;# -*-coding:utf-8;-*-                                               µ
 
 require 5;
 use 5.8.0;
-package Text::Unidecode;  # Time-stamp: "2014-06-23 03:40:17 MDT sburke@cpan.org"
+package Text::Unidecode;  # Time-stamp: "2014-06-30 01:54:22 MDT sburke@cpan.org"
 use utf8;
 use strict;
 use integer; # vroom vroom!
 use vars qw($VERSION @ISA @EXPORT @Char $UNKNOWN $NULLMAP $TABLE_SIZE);
-$VERSION = '1.00_03';
+$VERSION = '1.01';
 require Exporter;
 @ISA = ('Exporter');
 @EXPORT = ('unidecode');
@@ -638,6 +639,7 @@ L<perlunicode> and L<perlunitut>.
 
 Thanks to (in only the sloppiest of sorta-chronological order): Harald
 Tveit Alvestrand, Abhijit Menon-Sen, Mark-Jason Dominus, Joe Johnston,
+Conrad Heiney,
 Philip Newton, 唐鳳, Tomaž Šolc, Mike Doherty, JT Smith and the
 MadMongers, and I<many> other pals in Unicode's behind-the-scenes F5
 tornado underlying its code.
