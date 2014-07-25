@@ -1,5 +1,5 @@
 # This -*-perl-*- script writes the Makefile for installing this distribution.
-# ( Last Modified Time-stamp: "2014-06-17 19:30:16 MDT sburke@cpan.org" )
+# ( Last Modified Time-stamp: "2014-07-22 16:46:15 MDT sburke@cpan.org" )
 #======================================================================
 #
 # For info on instaling this module and how to control it, see:

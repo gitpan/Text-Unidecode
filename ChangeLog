@@ -1,9 +1,18 @@
  -*-coding:utf-8;-*- ··················································
- Last Modified Time-stamp: "2014-06-30 01:47:56 MDT sburke@cpan.org"
+ Last Modified Time-stamp: "2014-07-25 03:24:11 MDT sburke@cpan.org"
 #======================================================================
 
 Revision history for Perl module Text::Unidecode
 
+2014-07-25   Sean M. Burke  sburke@cpan.org
+	* !DEVELOPER RELEASE!
+	* !Release 1.20_01!
+	* Many bugfixes.  Thanks especially to Tomaž Šolc!
+	* Yet more *.t files added for improved sanity checking.
+	* Shuffling around the internals of Unidecode.pm
+	* Putting in some vacuous 0x__.pm files where
+	previously there would just be a load failure
+	
 2014-06-30   Sean M. Burke  sburke@cpan.org
 	* Release 1.01 -- first official Unidecode release since 2001!!!
 	* There are no real changes since the 2014-06-23 developer

@@ -19,4 +19,4 @@ no_index:
     - inc
 requires:
   perl: 5.008
-version: 1.01
+version: 1.20_01

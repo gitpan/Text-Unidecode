@@ -2,7 +2,7 @@
 use 5.8.0;
 use Test; use strict; use warnings;
 BEGIN { plan tests => 11 };
-print q[# // Time-stamp: "2014-06-17 18:29:00 MDT sburke@cpan.org"], "\n";
+print q[# // Time-stamp: "2014-07-04 02:16:23 MDT sburke@cpan.org"], "\n";
 
 # Summary of, well, things.
 ok 1; print "# ^-- Hello\n";
@@ -13,6 +13,8 @@ ok binmode(*STDOUT, ":utf8"); print "# ^-- Testing binmode on STDOUT\n";
 ok binmode(*STDERR, ":utf8"); print "# ^-- Testing binmode on STDERR\n";
 
 use Text::Unidecode;
+print "# Text::Unidecode version $Text::Unidecode::VERSION\n";
+
 ok "a", unidecode("a"); print "# ^-- sanity\n";
 
 {

@@ -1,12 +1,13 @@
 # -*- coding:utf-8; mode:CPerl -*-
 use 5.8.0; use strict; use warnings; use Test;
 BEGIN {plan tests => 12};
-print q[# // Time-stamp: "2014-06-17 23:35:22 MDT sburke@cpan.org"], "\n";
+print q[# // Time-stamp: "2014-07-04 02:16:00 MDT sburke@cpan.org"], "\n";
 
 # Summary of, well, things.
 ok 1;
 
 use Text::Unidecode;
+print "# Text::Unidecode version $Text::Unidecode::VERSION\n";
 ok "a", unidecode("a");
 
 {

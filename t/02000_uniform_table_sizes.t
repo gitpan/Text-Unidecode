@@ -5,10 +5,12 @@ my @Bank_Numbers;
 BEGIN { @Bank_Numbers = (1 .. 0xFF); }
 BEGIN {plan tests => 2 + 2 * @Bank_Numbers};
 ok 1;
-print q[# (Time-stamp: "2014-06-17 18:42:57 MDT sburke@cpan.org")], "\n";
+print q[# (Time-stamp: "2014-07-04 02:16:30 MDT sburke@cpan.org")], "\n";
 print "# Loading all modules and checking fullness of each table.\n";
 
 use Text::Unidecode;
+print "# Text::Unidecode version $Text::Unidecode::VERSION\n";
+
 $| = 1;
 
 #

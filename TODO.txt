@@ -1,8 +1,18 @@
 # -*-coding:utf-8;-*- ··················································
-# Last Modified Time-stamp: "2014-06-13 03:39:11 MDT sburke@cpan.org"
+# Last Modified Time-stamp: "2014-07-22 16:51:49 MDT sburke@cpan.org"
 #======================================================================
 
 	      ~~  Text::Unidecode TODO file  ~~
+
+TODO:
+Figure out how to courteously declare dependencies in my Makefile.PL
+
+TODO:
+Bundle with a "unidecode" util that calls a routine in Unidecode.pm?
+
+TODO:
+Plow through more bug reports, applying patches etc,
+especially stuff from that nice Tomaž Šolc man.
 
 TODO:
 
@@ -10,7 +20,7 @@ Populate 0x80-0x9F with their values from Win-1252.
 
 TODO:
 
-Make it handle stuff in hyperspace (over U+FFFF)
+Make it handle stuff in Astral Plane (over U+FFFF)
 
 TODO:
 
