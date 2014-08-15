@@ -2,12 +2,12 @@
 
 require 5;
 use 5.8.0;
-package Text::Unidecode;  # Time-stamp: "2014-07-25 03:31:41 MDT sburke@cpan.org"
+package Text::Unidecode;  # Time-stamp: "2014-08-15 04:23:21 MDT sburke@cpan.org"
 use utf8;
 use strict;
 use integer; # vroom vroom!
 use vars qw($VERSION @ISA @EXPORT @Char $UNKNOWN $NULLMAP $TABLE_SIZE);
-$VERSION = '1.20_01';
+$VERSION = '1.22';
 require Exporter;
 @ISA = ('Exporter');
 @EXPORT = ('unidecode');
@@ -94,8 +94,8 @@ sub unidecode {
   #       use other delimiters, such as "s!!!" and "s{}{}", 
   #  I didn't do it for sake of obscurity. I think it's just to
   #  keep my editor's syntax highlighter from crashing,
-  #  which was a problem with s///
-  #
+  #  which was a problem with s/// when the insides are as gory
+  #  as we have here.
 
   return unless defined wantarray; # void context
   return @_ if wantarray;  # normal list context -- return the copies

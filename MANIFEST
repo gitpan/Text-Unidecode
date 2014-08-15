@@ -1,7 +1,5 @@
 ChangeLog
 lib/Text/Unidecode.pm
-lib/Text/Unidecode/__blank.pm
-lib/Text/Unidecode/__check_all_here.pl
 lib/Text/Unidecode/x00.pm
 lib/Text/Unidecode/x01.pm
 lib/Text/Unidecode/x02.pm

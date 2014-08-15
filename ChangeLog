@@ -1,9 +1,14 @@
- -*-coding:utf-8;-*- ··················································
- Last Modified Time-stamp: "2014-07-25 03:24:11 MDT sburke@cpan.org"
-#======================================================================
+ -*-coding:utf-8;fill-column:79-*- ············································
+ Last Modified Time-stamp: "2014-08-15 04:32:57 MDT sburke@cpan.org"
+#==============================================================================
 
 Revision history for Perl module Text::Unidecode
 
+2014-08-15   Sean M. Burke  sburke@cpan.org
+	* RELEASE 1.22.  (The dev release works, so this is a version bump.)
+	* See notes for 2014-07-25, because this is the first public release
+	with significant changes since 2001!
+	
 2014-07-25   Sean M. Burke  sburke@cpan.org
 	* !DEVELOPER RELEASE!
 	* !Release 1.20_01!
