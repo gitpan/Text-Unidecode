@@ -1,8 +1,12 @@
 # -*-coding:utf-8;-*- ··················································
-# Last Modified Time-stamp: "2014-07-22 16:51:49 MDT sburke@cpan.org"
+# Last Modified Time-stamp: "2014-11-10 17:30:04 MST sburke@cpan.org"
 #======================================================================
 
 	      ~~  Text::Unidecode TODO file  ~~
+
+TODO GTD:
+Keep plugging in suggestions from Tomaž Šolc's message
+
 
 TODO:
 Figure out how to courteously declare dependencies in my Makefile.PL

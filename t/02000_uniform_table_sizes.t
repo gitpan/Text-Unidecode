@@ -5,7 +5,7 @@ my @Bank_Numbers;
 BEGIN { @Bank_Numbers = (1 .. 0xFF); }
 BEGIN {plan tests => 2 + 2 * @Bank_Numbers};
 ok 1;
-print q[# (Time-stamp: "2014-07-04 02:16:30 MDT sburke@cpan.org")], "\n";
+print q[# (Time-stamp: "2014-12-07 05:18:57 MST sburke@cpan.org")], "\n";
 print "# Loading all modules and checking fullness of each table.\n";
 
 use Text::Unidecode;
@@ -26,7 +26,10 @@ $| = 1;
 Bank:
 foreach my $banknum ( @Bank_Numbers ) {
   my $charnum = $banknum << 8;
-  my $char = chr( $charnum );
+
+  # Shut up warnings about UTF-16 surrogate characters
+  # This is per https://rt.cpan.org/Ticket/Display.html?id=97456
+  my $char = do { no warnings 'utf8'; chr( $charnum ) };
 
   print "# About to test banknum $banknum via charnum $charnum\:\n";
 
